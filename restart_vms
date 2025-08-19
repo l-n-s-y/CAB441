@@ -1,0 +1,20 @@
+#!/bin/bash
+# shutdown-vms.sh
+
+running=$(vboxmanage list vms)
+
+if [[ ! $running ]]; then echo "[!] no VMs detected."; exit; fi
+
+declare -i ctr=-1
+for u in $running; do
+    ctr=ctr+1
+    if [ $((ctr % 2)) -eq 0 ]; then
+	echo "[?] starting VM: ${u}"
+	continue
+    fi
+
+    echo "    UUID: ${u}"
+    vboxmanage startvm $u --type=headless;
+done
+echo ""
+echo "[*] all VMs started."

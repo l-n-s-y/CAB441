@@ -1,0 +1,32 @@
+#!/bin/bash
+# kill_vm
+
+running=$(vboxmanage list runningvms)
+
+if [[ ! $running ]]; then echo "[!] no running VMs detected."; exit; fi
+
+arr=()
+
+declare -i ctr=-1
+declare -i sec=0
+for u in $running; do
+    ctr=ctr+1
+    sec=$((ctr/2))
+    if [ $((ctr % 2)) -eq 0 ]; then
+	printf "[${sec}] : ${u}"
+	continue
+    fi
+    arr+=($u)
+    echo "    UUID: ${u}"
+done
+echo ""
+read -p "choose (or exit): " a
+
+if [ "$a" = "exit" ]; then
+    exit
+fi
+
+a_fmt=$(echo "${arr[a]}" | sed 's/{\(.*\)}/\1/')
+
+echo "[?] shutting down VM: ${a_fmt}"
+vboxmanage controlvm $a_fmt poweroff
