@@ -16,7 +16,9 @@ def main():
         # a tool is needed to deposit the public keys in the first place, so you 
         # can't make one without the other :)
         print("Sending to: ", hostname, ".student441...")
-        res = os.popen(f"sshpass -p {os.environ['SUPER_SECRET_SSH_PASSWORD']} ssh student@{ip} {comm}")
+        final_comm = f"sshpass -p {os.environ['SUPER_SECRET_SSH_PASSWORD']} ssh -oStrictHostKeyChecking=no student@{ip} {comm}"
+        print(final_comm)
+        res = os.popen(final_comm)
         if res is None:
             print("[!] ERROR: command send failed.")
         print(f"[ {hostname}.student441 ]=====================")
