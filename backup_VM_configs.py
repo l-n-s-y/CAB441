@@ -54,9 +54,9 @@ def main():
         dir_comm = nft_dir_command.format(ip)
         conf_comm = nft_conf_command.format(ip)
         print(f"\t[?] executing: [ {dir_comm} ]")
-        # os.system(dir_comm)
+        print(os.popen(dir_comm).read())
         print(f"\t[?] executing: [ {conf_comm} ]")
-        # os.system(conf_comm)
+        print(os.popen(conf_comm).read())
 
         os.chdir("../")
 
