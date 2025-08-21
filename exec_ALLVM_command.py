@@ -21,7 +21,8 @@ def exec_remote():
             # a tool is needed to deposit the public keys in the first place, so you 
             # can't make one without the other :)
             print("Sending to: " + hostname + ".student441...")
-            final_comm = f"sshpass -p {os.environ['SUPER_SECRET_SSH_PASSWORD']} ssh -oStrictHostKeyChecking=no student@{ip} {comm}"
+            #final_comm = f"sshpass -p {os.environ['SUPER_SECRET_SSH_PASSWORD']} ssh -oStrictHostKeyChecking=no student@{ip} {comm}"
+            final_comm = f"ssh student@{ip} {comm}"
             print(final_comm)
             res = os.popen(final_comm)
             if res is None:
@@ -47,7 +48,8 @@ def exec_local():
             ip = routing_table[hostname]
 
             print("Pointing at: " + hostname + ".student441...")
-            final_comm = f"sshpass -p {os.environ['SUPER_SECRET_SSH_PASSWORD']} " + comm.replace("-_-", ip)
+            #final_comm = f"sshpass -p {os.environ['SUPER_SECRET_SSH_PASSWORD']} " + comm.replace("-_-", ip)
+            final_comm = comm.replace("-_-", ip)
             print(final_comm)
             res = os.popen(final_comm)
             if res is None:
