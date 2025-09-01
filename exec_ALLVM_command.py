@@ -1,13 +1,18 @@
 #!/bin/python3
 
-import os
+import os,sys
 
 from backup_VM_configs import routing_table
 
+def exec_remote(command=None):
+    running = True
+    while running:
+        comm = command
+        if comm is None:
+            comm = input("$>")
+        else: # die after 1 cycle after being invoked with "--remote" from stdin
+            running = False
 
-def exec_remote():
-    while True:
-        comm = input("$>")
         if comm.lower() == "exit":
             break
         if comm.lower() == "help":
@@ -22,7 +27,7 @@ def exec_remote():
             # can't make one without the other :)
             print("Sending to: " + hostname + ".student441...")
             #final_comm = f"sshpass -p {os.environ['SUPER_SECRET_SSH_PASSWORD']} ssh -oStrictHostKeyChecking=no student@{ip} {comm}"
-            final_comm = f"ssh student@{ip} {comm}"
+            final_comm = f"ssh -i .ssh/id_rsa student@{ip} {comm}"
             print(final_comm)
             res = os.popen(final_comm)
             if res is None:
@@ -34,10 +39,12 @@ def exec_remote():
 
         print("[+] All command sends finished.")
 
-def exec_local():
+def exec_local(command=None):
     print("[?] include '-_-' where the hostname should go.")
     while True:
-        comm = input("$>")
+        comm = command
+        if comm is None:
+            comm = input("$>")
         if comm.lower() == "exit":
             break
         if comm.lower() == "help":
@@ -62,10 +69,11 @@ def exec_local():
 
 
 # todo: currently can't handle sudo level stuff, or anything involving a login prompt
-def main():
+def main(choice=-1,comm=None):
     print("1) local command")
     print("2) remote command")
-    choice = input("#>")
+    if choice == -1:
+        choice = input("#>")
     try:
         c = int(choice)
     except:
@@ -77,9 +85,23 @@ def main():
         exit()
 
     if c == 1:
-        exec_local()
+        exec_local(comm)
     else:
-        exec_remote()
+        exec_remote(comm)
 
 if __name__ == "__main__":
+    mode = -1
+    if "--local" in sys.argv:
+        mode = 1
+    if "--remote" in sys.argv:
+        mode = 2
+
+    if mode != -1:
+        if len(sys.argv) == 2:
+            print("[!] Bad format: give command")
+            exit()
+        command = " ".join(sys.argv[2:])
+        main(mode,command)
+        exit()
+
     main()
