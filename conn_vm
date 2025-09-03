@@ -8,28 +8,62 @@ if [[ ! $running ]]; then echo "[!] no running VMs detected."; exit; fi
 arr=()
 arr2=()
 
+declare -i Y=0
+declare -i X=0
+if [ -z $1 ]; then
+	X=0
+else
+	X=1;
+fi
+
 declare -i ctr=-1
 declare -i sec=0
 for u in $running; do
     ctr=ctr+1
     sec=$((ctr/2))
     if [ $((ctr % 2)) -eq 0 ]; then
-	printf "[${sec}] : ${u}"
+        u=$(echo $u | sed 's/\"//g')	
+	if [ $X -eq 0 ]; then
+		printf "[${sec}] : ${u}";
+	else
+		if [ "$u" = "$1" ]; then
+			echo "FOUND: ${u}"
+			Y=1;
+		fi;
+	fi
 	arr2+=($u)
 	continue
     fi
     arr+=($u)
-    echo "    UUID: ${u}"
+    if [ $Y -eq 1 ]; then
+	    echo "BREAKING"
+	    break;
+    fi
+    if [ $X -eq 0 ]; then
+	    echo "    UUID: ${u}";
+    fi
 done
-echo ""
-read -p "choose (or exit): " a
 
-if [ "$a" = "exit" ]; then
-    exit
+if [ $X -eq 0 ]; then
+	echo ""
+	read -p "choose (or exit): " a;
+
+	if [ "$a" = "exit" ]; then
+	    exit
+	fi
+
+	a_fmt=$(echo "${arr[a]}" | sed 's/{\(.*\)}/\1/')
+	a2_fmt=$(echo "${arr2[a]}" | sed 's/\"\(.*\)\"/\1/')
+else
+	if [ $Y -eq 0 ]; then
+		echo "[X] VM ${1} could not be found."
+		exit
+	fi
+	
+	a_fmt=$(echo "${arr[sec]}" | sed 's/{\(.*\)}/\1/')
+	a2_fmt=$(echo "${arr2[sec]}" | sed 's/\"\(.*\)\"/\1/')
 fi
 
-a_fmt=$(echo "${arr[a]}" | sed 's/{\(.*\)}/\1/')
-a2_fmt=$(echo "${arr2[a]}" | sed 's/\"\(.*\)\"/\1/')
 
 echo "[?] connecting to VM: ${a2_fmt} [${a_fmt}]"
 #vboxmanage controlvm $a_fmt poweroff
