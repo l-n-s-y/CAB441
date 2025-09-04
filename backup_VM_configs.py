@@ -3,7 +3,6 @@
 import os, shutil
 
 routing_table = {
-    "host VM": "172.0.99.1",
     "extrouter": "172.0.99.2",
     "introuter1": "172.0.99.3",
     "introuter2": "172.0.99.4",

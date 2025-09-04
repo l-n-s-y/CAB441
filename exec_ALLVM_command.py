@@ -19,6 +19,14 @@ def exec_remote(command=None):
             print("enter bash command or 'exit'")
             continue
 
+        comm_ponents = comm.split(" ")
+        if comm_ponents[0] == "sudo": # execute as superuser 
+            password = input("SUDO password: ")
+            comm_ponents.insert(1,"-S")
+            comm_ponents = [f"echo {password} |"] + comm_ponents
+
+        comm = " ".join(comm_ponents)
+
         for hostname in routing_table:
             ip = routing_table[hostname]
             
@@ -27,7 +35,8 @@ def exec_remote(command=None):
             # can't make one without the other :)
             print("Sending to: " + hostname + ".student441...")
             #final_comm = f"sshpass -p {os.environ['SUPER_SECRET_SSH_PASSWORD']} ssh -oStrictHostKeyChecking=no student@{ip} {comm}"
-            final_comm = f"ssh -i .ssh/id_rsa student@{ip} {comm}"
+
+            final_comm = f"ssh -i ~/.ssh/id_rsa student@{ip} '{comm}'"
             print(final_comm)
             res = os.popen(final_comm)
             if res is None:
@@ -70,9 +79,9 @@ def exec_local(command=None):
 
 # todo: currently can't handle sudo level stuff, or anything involving a login prompt
 def main(choice=-1,comm=None):
-    print("1) local command")
-    print("2) remote command")
     if choice == -1:
+        print("1) local command")
+        print("2) remote command")
         choice = input("#>")
     try:
         c = int(choice)
