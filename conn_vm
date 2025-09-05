@@ -67,4 +67,6 @@ fi
 
 echo "[?] connecting to VM: ${a2_fmt} [${a_fmt}]"
 #vboxmanage controlvm $a_fmt poweroff
-ssh student@$(cat admin_VM_ips | grep -i ${a2_fmt} | sed 's/ .*//')
+script_dir=$(dirname "$0")
+script_dir+="/admin_VM_ips"
+ssh student@$(cat ${script_dir}| grep -i ${a2_fmt} | sed 's/ .*//')
